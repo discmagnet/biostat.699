@@ -1,0 +1,76 @@
+DATASET 1
+
+Subject: identifier (S##)
+Gender: M=male, F=female
+Age: continuous variable in years
+Group: categorical variable (OA (osteoarthritis), PN (diabetic peripheral neuropathy), Control)
+MDNS: Michigan Diabetic Neuropathy Score (notice those with PN generally had higher scores)
+Foot: categorical variable (Right, Left)
+Hand: categorical variable (Right, Left, Both)
+TUG: Timed Up and Go; subject stands up from a chair, walks a 3m distance, circles around a cone on the floor, and comes back to the chair and sits down; duration measured in seconds; minimum time taken out of two attempts
+mTUG: Number of missing measurements
+OLB_R: One Leg Balance Time with Right Foot; duration measured in seconds (up to 30); maximum time taken out of three attempts
+mOLB_R: Number of missing measurements
+OLB_L: One Leg Balance Time with Left Foot; duration measured in seconds (up to 30); maximum time taken out of three attempts
+mOLB_L: Number of missing measurements
+GripR: Maximum isometric grip strength with Right hand
+mGripR: Number of missing measurements
+GripL: Maximum isometric grip strength with Left hand
+mGripL: Number of missing measurements
+MMSE: Mini-Mental State Examination test used to measure cognitive impairment; 30 is a perfect score indicating no cognitive impairments
+TrailsB: Trails making test B; the subject connects a set of 25 dots, alternating between numbers and letters, as fast as possible while still maintaining accuracy; duration measured in seconds
+KneeExt: Maximum isometric knee extension strength; only left knee strength was measured at 90 degree flexion angle; reported as a torque in N*m
+mKnee: Number of missing measurements
+HipABd: Maximum isometric hip abduction strength; only left hip abduction strength was measured at 0 degree abduction angle; reported as a torque in N*m
+mHipABd: Number of missing measurements
+HipRTD: Maximum hip abduction rate of torque development; only left hip RTD at 0 degree abduction angle; units are N*m/s
+mHipRTD: Number of missing measurements
+SRT: Simple Reaction Test; average time is recorded
+RRT: Recognition Reaction Test; average time of catching the stick in the trials when the light came on (in milliseconds)
+Accuracy: The percentage of times the subject caught/let the stick drop correctly
+OffAccuracy: The percentage of time the subject let the stick drop when the lights were off
+
+NOTES:
+- Since we already have information about foot size, I decided to completely remove the shoe size variable, as it was very hard to work with. There were Men's and Women's sizes, but some women wore Men's shoes, and one person had two different sizes.
+- I am not too worried about the missing values for the OLB measurements. I am interested in the maximum times, and many of those without all three measurements were those with high times. I figure that they thought they were "too good" to do it all three times.
+
+DATASET 2
+
+Subject: identifier (S##)
+Gender: M=male, F=female
+ankle: Ankle height in mm
+Age: continuous variable in years
+stature_wos: Stature without shoes in mm
+stature_ws: Stature with shoes in mm
+weight: Weight in kilograms
+shoulder: Shoulder width in mm
+knee: Knee height sitting in mm
+waist: Waist circumference in mm
+uparm: Upper arm length in mm
+hip: Hip-breadth standing in mm
+shoe: Shoe length in mm
+deltoid: Deltoidal shoulder width in mm
+radiale: Radiale-stylion length in mm
+sitting: Sitting height in mm
+butt: Buttock-knee length in mm
+foot: Foot length in mm
+vehicle_door: Vehicle and Door pairing
+vehicle: Number of the Vehicle
+open: indicator for whether the door was completely open
+dim01: Vehicle Dimension 1
+dim02: Vehicle Dimension 2
+dim03: Vehicle Dimension 3
+dim04: Vehicle Dimension 4
+dim05: Vehicle Dimension 5
+dim06: Vehicle Dimension 6
+dim07: Vehicle Dimension 7
+dim08: Vehicle Dimension 8
+dim09: Vehicle Dimension 9
+dim10: Vehicle Dimension 10
+dim11: Vehicle Dimension 11
+rating: Subjective Rating on a scale from 1 to 50 with lower scores being more comfortable
+order: Vehicle Order ???
+ingress: the time it took the subject to get in a seated position for each vehicle configuration measured in seconds
+egress: the time it took the subject to get out of the vehicle for each vehicle configuration measured in seconds
+in_strategy: ingress strategy, either 'normal' or 'twofeet'
+e_strategy: egress strategy, either 'normal' or 'twofeet'
