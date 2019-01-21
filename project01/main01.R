@@ -22,7 +22,9 @@ facet_labels <- c(
 )
 
 plot01 <- ggplot(data = dataset03,
-                 aes(y = ingress, x = vehicle, group = vehicle)) +
+                 aes(y = ingress,
+                     x = vehicle,
+                     group = vehicle)) +
   geom_boxplot() +
   facet_grid(.~open, labeller = as_labeller(facet_labels)) +
   xlab("Vehicle") +
@@ -31,7 +33,9 @@ plot01 <- ggplot(data = dataset03,
 plot01
 
 plot02 <- ggplot(data = dataset03,
-                 aes(y = egress, x = vehicle, group = vehicle)) +
+                 aes(y = egress,
+                     x = vehicle,
+                     group = vehicle)) +
   geom_boxplot() +
   facet_grid(.~open, labeller = as_labeller(facet_labels)) +
   xlab("Vehicle") +
@@ -42,7 +46,10 @@ plot02
 # Look at a spaghetti plot of the ingress and egress times for each subject
 
 plot03 <- ggplot(data = dataset03,
-                 aes(x = vehicle_door, y = ingress, group = Subject, color = Group)) +
+                 aes(x = vehicle_door,
+                     y = ingress,
+                     group = Subject,
+                     color = Group)) +
   geom_line() +
   xlab("Vehicle-Door Combination") +
   ylab("Ingress Time (seconds)") +
@@ -50,9 +57,47 @@ plot03 <- ggplot(data = dataset03,
 plot03
 
 plot04 <- ggplot(data = dataset03,
-                 aes(x = vehicle_door, y = egress, group = Subject, color = Group)) +
+                 aes(x = vehicle_door,
+                     y = egress,
+                     group = Subject,
+                     color = Group)) +
   geom_line() +
   xlab("Vehicle-Door Combination") +
   ylab("Egress Time (seconds)") +
   theme_bw()
 plot04
+
+# Look at correlation structures
+library(corrplot)
+body.m <- cor(dataset03[,c(3,5:18)])
+corrplot(body.m, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+apply(as.data.frame(body.m), 1, FUN=min)
+apply(as.data.frame(body.m), 1, FUN=mean)
+# weight variable to repesent body measures
+
+strength.m <- cor(dataset03[,c(49,51,55,57,59)], use = "complete.obs")
+corrplot(strength.m, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+apply(as.data.frame(strength.m), 1, FUN=min)
+apply(as.data.frame(strength.m), 1, FUN=mean)
+# HipABd variable to represent strength measures
+
+dataset03 <- mutate(dataset03, OLB_good = (OLB_R + OLB_L) > 40)
+dataset03 <- mutate(dataset03, OLB_poor = (OLB_R + OLB_L) < 15)
+dataset03 <- mutate(dataset03, OLB_okay = ((OLB_R + OLB_L) >= 15) & ((OLB_R + OLB_L) <= 40))
+dataset03 <- mutate(dataset03, OLB_score = 200*OLB_poor + 100*OLB_okay + 50*OLB_good)
+mobility.m <- cor(dataset03[,c(43,45,47)], use = "complete.obs")
+View(mobility.m)
+corrplot(mobility.m, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+# OLB_L variable to represent mobility measures
+
+cognitive.m <- cor(dataset03[,c(40,53,54,61:64)], use = "complete.obs")
+corrplot(cognitive.m, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+apply(as.data.frame(cognitive.m), 1, FUN=min)
+apply(as.data.frame(cognitive.m), 1, FUN=mean)
+# weak correlations between cognitive measures
+
+# create linear model to look at associations
