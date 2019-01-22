@@ -84,7 +84,7 @@ apply(as.data.frame(strength.m), 1, FUN=mean)
 # HipABd variable to represent strength measures
 
 dataset03 <- mutate(dataset03, OLB_good = (OLB_R + OLB_L) > 40)
-dataset03 <- mutate(dataset03, OLB_poor = (OLB_R + OLB_L) < 15)
+dataset03 <- mutate(dataset03, OLB_poor = (OLB_R + OLB_L) < 10)
 dataset03 <- mutate(dataset03, OLB_okay = ((OLB_R + OLB_L) >= 15) & ((OLB_R + OLB_L) <= 40))
 dataset03 <- mutate(dataset03, OLB_score = 200*OLB_poor + 100*OLB_okay + 50*OLB_good)
 mobility.m <- cor(dataset03[,c(43,45,47)], use = "complete.obs")
@@ -101,3 +101,30 @@ apply(as.data.frame(cognitive.m), 1, FUN=mean)
 # weak correlations between cognitive measures
 
 # create linear model to look at associations
+dataset03 <- mutate(dataset03,
+                    age_c = Age - mean(Age),
+                    weight_c = weight - mean(weight),
+                    HipABd_c = HipABd - mean(HipABd))
+dataset04 <- subset(dataset03, in_strategy != "")
+model01 <- lm(data = dataset04,
+              ingress ~ age_c + factor(Gender) + factor(vehicle) + open + weight_c + 
+                HipABd_c + OLB_poor + factor(Group) + factor(in_strategy))
+summary(model01)
+
+library(lme4)
+model02 <- lmer(data = dataset04,
+                ingress ~ age_c + factor(Gender) + open + (1+open|vehicle) + weight_c + 
+                  HipABd_c + OLB_poor + factor(Group) + factor(in_strategy))
+summary(model02)
+ranef(model02)
+
+model03 <- lmer(data = dataset04,
+                ingress ~ age_c + factor(Gender) + open + (1|vehicle) + (1|Subject) + weight_c + 
+                  HipABd_c + OLB_poor + factor(Group) + factor(in_strategy))
+summary(model03)
+
+library(broom)
+lik_02 <- glance(model02)$logLik
+lik_03 <- glance(model03)$logLik
+LRT_stat <- -2*(lik_03-lik_02)
+pchisq(LRT_stat,1,lower.tail = FALSE)
