@@ -121,6 +121,9 @@ dataset03 <- mutate(dataset03,
                     age_c = Age - mean(Age),
                     weight_c = weight - mean(weight),
                     HipABd_c = HipABd - mean(HipABd),
+                    TrailsB_c = TrailsB - mean(TrailsB),
+                    dim8c = dim08 - mean(dim08),
+                    dim9c = dim09 - mean(dim09),
                     log_ing = log(ingress),
                     log_eg = log(egress))
 dataset04 <- subset(dataset03, in_strategy != "")
@@ -140,17 +143,17 @@ model03 <- lmer(data = dataset04,
                 egress ~ age_c + factor(Gender) + open + (1|vehicle) + (1|Subject) + weight_c + 
                   HipABd_c + OLB_poor + factor(Group) + factor(e_strategy))
 summary(model03)
-
+library(lmerTest)
 model04 <- lmer(data = dataset04,
-                ingress ~ age_c + factor(Gender) + open + (1|Subject) + weight_c + 
-                HipABd_c + factor(OLB_poor) + factor(Group) + factor(in_strategy) + 
-                dim08 + dim09)
+                egress ~ age_c + factor(Gender) + open + (1|Subject) + weight_c + 
+                HipABd_c + OLB_L + factor(Group) + factor(e_strategy) + TrailsB_c +
+                dim8c + dim9c)
 summary(model04)
 glance(model04)
 
 model05 <- lmer(data = dataset04,
-                egress ~ age_c + factor(Gender) + open + (1|Subject) + weight_c + 
-                  HipABd_c + OLB_poor + factor(Group))
+                ingress ~ weight_c + (1|Subject))
+r.squaredGLMM(model05)
 summary(model05)
 
 library(broom)
