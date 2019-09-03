@@ -6,7 +6,7 @@
 
 ### Key Words
 
-[R Code](https://github.com/discmagnet/biostat.699/blob/master/project01/main01.R) | [Interim Presentation](https://github.com/discmagnet/biostat.699/blob/master/project01/interim01.pdf) | [Project 5 Poster]
+[R Code](https://github.com/discmagnet/biostat.699/blob/master/project01/main01.R) | [Interim Presentation](https://github.com/discmagnet/biostat.699/blob/master/project01/interim01.pdf) | [Final Poster](https://github.com/discmagnet/biostat.699/blob/master/project01/final_poster.pdf)
 
 ## Project 2
 
@@ -22,7 +22,7 @@
 
 ### Key Words
 
-[R Code](https://github.com/discmagnet/biostat.699/blob/master/project03/main03.R) | [Final Presentation]
+[R Code](https://github.com/discmagnet/biostat.699/blob/master/project03/main03.R) | [Final Presentation](https://github.com/discmagnet/biostat.699/blob/master/project03/final03.pdf)
 
 ## Project 4
 
