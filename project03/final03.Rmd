@@ -1,0 +1,172 @@
+---
+title: "Menthol & Smoking Cessation Disparities"
+subtitle: "Biostatistics 699 Project #3"
+author: "Kyle Kumbier"
+date: "March 28, 2019"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Dresden
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Background
+
+## Population Assessment of Tobacco and Health (PATH) Study 
+
+- Conducted by the National Institutes of Health (NIH) and the US Food and Drug Administration (FDA)  between 2013 and 2016
+
+- In an effort to better understand tobacco use behaviors and how its use affects health over time
+
+## Overview of PATH Dataset
+
+- Longitudinal design with 3 waves:
+    
+    - Wave 1: 2013-14 (32,320 participants)
+    - Wave 2: 2014-15 (28,362 participants)
+    - Wave 3: 2015-16 (28,148 participants)
+
+- Sample is representative of civilian, non-institutionalized US population age 12 and older
+
+- Some demographics were oversampled
+
+    - Tobacco Users
+    - Young Adults (18-24)
+    - African Americans
+    
+- Survey weights were also provided to ensure representativeness
+
+## Aims
+
+Primary Aims
+
+  1. Does smoking **menthol cigarettes** make a smoker less likely to quit smoking altogether?
+  
+      
+  2. Does using **flavored electronic cigarettes** make someone more or less likely to quit cigarette smoking altogether?
+
+Secondary Aims
+
+  - Are there differential effects by population subgroups, from a health disparities perspective?
+  - These subgroups being based on gender, age, race, education, income, and region
+
+# Primary Aims
+
+## Methodology
+
+  - Even though the PATH study consists of longitunal data, we took a non-longitudinal approach
+  
+  - Performed logistic regression to try and predict outcomes in Waves 2 and 3 with characteristics in Wave 1
+  
+  - Only used subjects who participated in every wave (23,670)
+  
+  - Defined **smokers** as those who reported as current smokers in Wave 1 (yes or no)
+  
+  - Defined **menthol users** as those who reported using menthol cigarettes in Wave 1 (yes or no)
+  
+  - Defined **e-cigarette users** as those who reported using e-cigarettes in Wave 1 with two levels (yes-flavored, yes-unflavored, or no)
+
+## Defining Quitting (1 of 3)
+
+Prioritize reported **quit status** over reported **smoking status** to deal with contradictions.
+
+1. The established smoker responds as quitting in Wave 3: \textcolor{blue}{QUITTER}
+  
+2. The established smoker is missing a response for quit status in Wave 3, but responds as a former smoker as of Wave 3: \textcolor{blue}{QUITTER}
+  
+3. The established smoker is missing a response for quit status in Wave 3, but responds as a current smoker as of Wave 3: \textcolor{red}{NOT A QUITTER}
+
+## Defining Quitting (2 of 3)
+
+4. The established smoker responds as not quitting in Wave 3 and responds as a current smoker as of Wave 3: \textcolor{red}{NOT A QUITTER}
+
+5. The established smoker responds as not quitting in Wave 3, but responds as a former smoker as of Wave 3 and responds as quitting in Wave 2: \textcolor{blue}{QUITTER}
+
+6. The established smoker responds as not quitting in Wave 3 and responds as a former smoker as of Wave 3, but responds as not quitting in Wave 2: \textcolor{red}{NOT A QUITTER}
+
+## Defining Quitting (3 of 3)
+
+7. The established smoker responds as not quitting in Wave 3. but responds as a former smoker as of Wave 3, has a missing response for quit status in Wave 2, and responds as a former smoker as of Wave 2: \textcolor{blue}{QUITTER}
+
+8. The established smoker responds as not quitting in Wave 3, responds as a former smoker as of Wave 3, has a missing response for quit status in Wave 3, and responds as a current smoker as of Wave 2: \textcolor{red}{NOT A QUITTER}
+
+9. Any other case is put as a missing value and not included in the analysis 
+
+
+## Menthol Results
+
+### Unadjusted Association
+
+- Log odds of quitting is \textcolor{blue}{0.056 lower} for those who smoke menthol cigarettes compared to those who do not.
+
+- 95% CI: (-0.202, 0.089) Statistically \textcolor{red}{insignificant}
+
+### Adjusted Association
+
+- Log odds of quitting is \textcolor{blue}{0.055 lower} for those who smoke menthol cigarettes compared to those who do not, *after adjusting for gender, age, race, education, income, and region*.
+
+- 95% CI: (-0.230, 0.120) Statistically \textcolor{red}{insignificant}
+
+## Forest Plot
+
+![](menth_forest.jpeg)
+
+## Flavored E-Cig Results (1 of 2)
+
+### Unadjusted Association
+
+- Log odds of quitting is \textcolor{blue}{0.379 higher} for those who smoke flavored e-cigarettes *compared to those who do not smoke any e-cigarettes*.
+
+- 95% CI: (-0.664, -0.093) Statistically \textcolor{blue}{significant}
+
+- Log odds of quitting is \textcolor{blue}{0.035 lower} for those who smoke flavored e-cigarettes *compared to those who smoke e-cigarettes without a flavor*.
+
+- 95% CI: (-0.422, 0.492) Statistically \textcolor{red}{insignificant}
+
+## Flavored E-Cig Results (2 of 2)
+
+### Adjusted Association
+
+- Log odds of quitting is \textcolor{blue}{0.222 higher} for those who smoke flavored e-cigarettes compared to those who do not smoke any e-cigarettes, *after adjusting for gender, age, race, education, income, and region*.
+
+- 95% CI: (-0.538, 0.094) Statistically \textcolor{red}{insignificant}
+
+- Log odds of quitting is \textcolor{blue}{0.168 lower} for those who smoke flavored e-cigarettes compared to those who smoke e-cigarettes without a flavor, *after adjusting for gender, age, race, education, income, and region*.
+
+- 95% CI: (-0.314, 0.649) Statistically \textcolor{red}{insignificant}
+
+## Forest Plot
+
+![](ecig_forest.jpeg)
+
+# Secondary Aims
+
+## Methodology
+
+  - To determine if there were differential effects between subgroups, we looked at possible interactions
+  
+  - Fit logistic regression models that start with the adjusted model (fit previously) and adds a single interaction between the exposure of interest and subgroup characteristic of interest
+  
+  - Conducted likelihood ratio test to determine if the interaction term improves the fit of the model
+
+## Menthol Results
+
+![](menth_table.JPG)
+
+## Flavored E-Cig Results
+
+![](ecig_table.JPG)
+
+# Summary
+
+## Summary
+
+- Insufficient evidence that either menthol cigarettes or flavored e-cigarettes make a smoker more or less likely to quit smoking
+
+- Insufficient evidence there are differential effects by population subgroups
+
+- Questions?

@@ -1,0 +1,199 @@
+---
+title: "HemeCaRe Follicular Lymphoma Study"
+subtitle: "Biostatistics 699 Project #2"
+author: "Kyle Kumbier"
+date: "February 28, 2019"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    fonttheme: structurebold
+    theme: Dresden
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+# Background
+
+## Follicular Lymphoma
+
+- Type of non-Hodgkin's lymphoma that affects B-lymphocyte white blood cells, which are responsible for secreting antibodies
+
+- Not known to be curable, but progresses slowly
+
+- Can transform to Diffuse Large B-cell Lymphoma (DLBCL)
+
+## Overview of Dataset
+
+- 418 individuals with Follicular Lymphoma (FL)
+- Many variables to consider:
+    
+    - Demographics
+    - Key dates (birth, death, diagnosis, last contact, etc.)
+    - Additional diagnosis/disease specifics (e.g. stage of disease)
+    - Lab measurements upon entering treatment at Michigan
+    - Treatment information on up to 10 treatment regimens
+
+## Aims
+
+  1. Compare the overall survival (OS) and progression free survival (PFS) of patients with FL.
+  
+      - Specifically: Compare OS and PFS between patients treated with Bendamustine + Rituximab and those with other treatments.
+      
+  2. What is the incidence of Transformation of FL to Diffuse Large B-cell Lymphoma (DLBCL)?
+  
+      - Specifically: Does treatment play a role in progression to DLBCL?
+      
+# Aim #1
+
+## Defining Overall and Progression Free Survival
+
+### Overall Survival
+
+- Time Zero defined as date of \textcolor{blue}{first official treatment}
+- Observation does not count as an official treatment
+- Survival time defined as time until \textcolor{blue}{death} or censoring
+- Date of censoring is the later of the \textcolor{blue}{censor date} and \textcolor{blue}{last contact date}
+
+### Progression Free Survival
+
+- Time Zero defined the same way as OS
+- Survival time defined as time until \textcolor{blue}{first progression} or censoring
+- Date of censoring is the last available \textcolor{blue}{response date}
+
+## Defining OS and PFS Continued
+
+![](timeline.JPG)
+
+## Patients to Exclude from Analysis
+
+1. Those who transformed to DLBCL before treatment at Michigan
+
+    - no information about pre-transformative state
+    - \textcolor{red}{18 patients excluded}
+    
+2. Those who were diagnosed away from Michigan and did not start treatment at Michigan soon after
+
+    - an effort to deal with **left truncation**
+    - only look at patients whose lab date is within 6 months of diagnosis date
+    - \textcolor{red}{86 patients excluded}
+
+## Patients to Exclude from Analysis
+
+3. Those who did not receive a treatment and/or did not have a treatment date
+
+    - without a date to use as time zero, there's not much we can do
+    - \textcolor{red}{42 patients excluded}
+    
+4. Those who had a treatment date, but no treatment specified
+
+    - \textcolor{red}{6 patients excluded}
+    
+5. Those under observation during the first regimen, but did not receive a treatment after
+
+    - as useful as the people without a treatment at all
+    - \textcolor{red}{78 patients excluded}
+
+## Patients to Exclude from Analysis
+
+![](chart2.JPG)
+
+## Patients to Exclude from Analysis
+
+21 additional patients had to be excluded for the PFS analysis:
+
+6. Those who somehow responded to treatment before actually receiving treatment
+
+    - \textcolor{red}{2 patients excluded}
+    
+7. Those who did not progress, but also did not have any response dates
+
+    - without a date to use for time until censoring, there's not much we can do
+    - \textcolor{red}{19 patients excluded}
+
+New total of 167 patients for the PFS analysis
+
+## 5-year survival: 0.887 (0.840, 0.949)
+
+![](os_total.jpeg)
+
+
+## No Apparent Difference Between Treatments
+
+![](os_group.jpeg)
+
+## No Apparent Difference Between Treatments
+
+Fit a Cox model to estimate treatment effect (unadjusted)
+
+- Those who received the Rituximab & Bendamustine treatment have a 10% reduction in hazard of death compared to those receiving other treatments.
+- Hazard Ratio: 0.897
+- 95% CI: (0.335, 2.404)
+    
+Fit a second Cox model that adjusts for age and gender
+
+- Reached nearly the same conclusion
+- Hazard Ratio: 0.916
+- 95% CI: (0.339, 2.470)
+
+## Median survival: 0.83 years (approx. 10 months)
+
+![](pfs_total.jpeg)
+
+## No Apparent Difference Between Treatments
+
+![](pfs_group.jpeg)
+
+## No Apparent Difference Between Treatments
+
+Fit a Cox model to estimate treatment effect (unadjusted)
+
+- Those who received the Rituximab & Bendamustine treatment have a 20% increase in hazard of progression compared to those receiving other treatments.
+- Hazard Ratio: 1.195
+- 95% CI: (0.714, 2.001)
+    
+Fit a second Cox model that adjusts for age and gender
+
+- Reached nearly the same conclusion
+- Hazard Ratio: 1.187
+- 95% CI: (0.707, 1.994)
+
+# Aim #2
+
+## Defining Transformation Free Survival
+
+- Time Zero defined as date of \textcolor{blue}{first official treatment}
+- Survival time defined as time until date of \textcolor{blue}{last contact} for *both* those who transform to DLBCL ($\delta = 1$) and those who do not, and are thus censored ($\delta = 0$)
+- Relaxed exclusion criteria (step 2 addressing left truncation) to include more events (increasing from 27 to 47 transformations)
+
+## 5-year survival: 0.824 (0.761, 0.892)
+
+![](trans_all.jpeg)
+
+## No Apparent Difference Between Treatments
+
+![](trans_group.jpeg)
+
+## No Apparent Difference Between Treatments
+
+Fit a Cox model to estimate treatment effect (unadjusted)
+
+- Those who received the Rituximab & Bendamustine treatment have a 2% increase in hazard of transformation compared to those receiving other treatments.
+- Hazard Ratio: 1.02
+- 95% CI: (0.41, 2.53)
+    
+Fit a second Cox model that adjusts for age and gender
+
+- Reached nearly the same conclusion
+- Hazard Ratio: 0.98
+- 95% CI: (0.39, 2.44)
+
+## Summary
+
+- There was no apparent difference between being treated with Rituximab & Bendamustine and other treatments in any of the analyses
+- Limitations:
+    
+    - Proportionality assumption violated
+    - Not enough events to answer the given research questions
+    
+Open for questions...

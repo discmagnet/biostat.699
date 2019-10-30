@@ -1,0 +1,198 @@
+---
+title: "Project 1 Interim"
+author: "Kyle Kumbier"
+date: "Jan 22, 2019"
+output:
+  beamer_presentation:
+    colortheme: wolverine
+    fonttheme: structurebold
+    theme: AnnArbor
+  ioslides_presentation: default
+  slidy_presentation: default
+fontsize: 20pt
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+setwd("~/WORKING_DIRECTORIES/biostat.699/project01")
+
+library(readr)
+library(dplyr)
+dataset01 <- read.csv("dataset01.csv") # load cleaned version of thedata.csv
+dataset02 <- read.csv("dataset02.csv") # load cleaned version of Copy+of+Elderly+Driver+Data.xlsx
+dataset02 <- dataset02[,1:38] # has three unnecessary columns when loaded for some reason
+colnames(dataset02)[1] <- "Subject" # first column name gets messed up for some reason
+dataset03 <- left_join(dataset02,dataset01[,c(1,4:29)],by="Subject") # merge datasets
+
+library(ggplot2)
+```
+
+## Outline
+
+- Background
+
+- Data Management
+
+- Exploratory Data Analysis
+
+- Main Aims and Preliminary Models
+
+- Future Work
+
+## Background
+
+- With an aging population, car companies must keep the interests of the elderly in mind.
+
+- One particular issue they face is simply getting in and out of the vehicle.
+
+## Background
+
+- Dr. Galecki provided two specific aims for us to answer, but I also wanted to focus my analysis towards results we can implement.
+
+# Data Management
+
+## Data Management
+
+1. Discarded shoe size variable completely from the first dataset.
+
+## Data Management
+
+2. Took the **peak performance** of all repeated measurements
+
+    - Knee Extension Strength
+    - Hip Abduction Strength
+    - Hip Abduction Rate of Torque
+    - Grip Strength
+    - Timed Up and Go
+    - One Leg Balancing
+
+## Data Management
+
+3. Kept track of number of missing measurements for each subject
+
+    - Not worried about One Leg Balancing Measurements
+
+## Data Management
+
+4. Created categorical One Leg Balancing variable
+
+    - Sum of peak performance in each leg
+    - Poor balance if less than 15
+    
+## Data Management
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+hist(dataset03$OLB_R + dataset03$OLB_L, main = "Distribution of Sum Times", xlab = "Sum of Max Times from Each Leg", ylab = "Frequency", cex.lab=1.5, cex.axis=1.5, cex.main=2, cex.sub=1.5)
+```
+
+## Data Management
+
+5. Analyzed correlation structures in each of the following categories to find a single representative variable
+
+    - Anthropometric
+    - Strength
+    - Mobility
+
+## Data Management
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(corrplot)
+body.m <- cor(dataset03[,c(3,5:18)])
+corrplot(body.m, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+```
+
+# Exploratory Data Analysis
+
+## EDA
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+facet_labels <- c(
+  '0' = "Parking Lot",
+  '1' = "Open"
+)
+plot01 <- ggplot(data = dataset03,
+                 aes(y = ingress, x = vehicle, group = vehicle)) +
+  geom_boxplot() +
+  facet_grid(.~open, labeller = as_labeller(facet_labels)) +
+  ggtitle("Ingress Time by each Vehicle/Door Position") +
+  xlab("Vehicle") +
+  ylab("Ingress Time (seconds)") +
+  theme_bw() +
+  theme(text = element_text(size = 28),
+        plot.title = element_text(hjust = 0.5))
+plot01
+```
+
+## EDA
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+plot04 <- ggplot(data = dataset03,
+                 aes(x = vehicle_door, y = egress, group = Subject, color = Group)) +
+  geom_line() +
+  ggtitle("Egress Time by Subject") +
+  xlab("Vehicle-Door Combination") +
+  ylab("Egress Time (seconds)") +
+  theme_bw() +
+  theme(text = element_text(size = 28),
+        plot.title = element_text(hjust = 0.5))
+plot04
+```
+
+## EDA Summary
+
+- Random effects appear to be appropriate for both vehicles and subjects
+
+- What makes Vehicle #2 and Vehicle #7 different?
+
+# Main Aims and Preliminary Models
+
+## Aim #1
+
+### Does egress (ingress) strategy affect driver egress (ingress) time in the elderly?
+
+### Do mobility impairments affect driver egress (ingress) time in the elderly?
+
+## Aim #2
+
+### Identify the human capacities that best explain the variation in egress (ingress) time between drivers.
+
+## Preliminary Models
+
+- Linear model adjusting for age, gender, vehicle, door position, weight, hip strength, poor balance, group, and strategy
+
+    - ingress strategy nearly significant (p=0.06)
+    - egress strategy nearly significant (p=0.06)
+
+## Preliminary Models
+
+- Linear mixed model with random intercepts for vehicle and subject
+
+    - ingress strategy highly significant (p<0.01)
+    - egress strategy not significant (p=0.18)
+    
+## Preliminary Models
+
+- Linear mixed model with random intercept for vehicle and random slope for door position by vehicle
+
+    - Resulted in a singular fit
+    - Too few random effect levels (7)
+    - Indicates overfitting the model
+
+# Future Work
+
+## Future Work
+
+- Identify the human capacities that best explain variation in ingress/egress times (Aim #2)
+
+## Future Work
+
+- Identify which dimensions (if any) have a significant effect on ingress/egress times
+
+    - An explanation to why drivers did better with certain vehicles
+    - Give information to engineers so they can design "elderly-friendly" vehicles
+
+# Questions???

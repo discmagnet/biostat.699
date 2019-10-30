@@ -1,0 +1,193 @@
+---
+title: "Headcount for Hashbrowns"
+subtitle: "Biostatistics 699 Project #4 Interim Presentation"
+author: "Kyle Kumbier"
+date: "April 4, 2019"
+output:
+  beamer_presentation:
+    colortheme: albatross
+    fonttheme: structurebold
+    theme: Frankfurt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Design Question 2
+
+## Background
+
+**Who are we trying to help?**
+
+- Some patients with cancers of the blood are receiving an alloHSCT from a genetically-matched donor because other forms of treatment are not working
+- Among those who receive an alloHSCT, 40-50% experience an immune reaction called acute graft-versus-host disease (aGVHD)
+
+**What is aGVHD?**
+
+- GVHD occurs when the T-cells of the graft fight the remaining immune system of the host
+- It is classified as **acute** if it occurs within 100 days
+- One of the leading causes of early death in HSCT recipients with few approaches to prevent or treat
+
+## Background
+
+**What can be done?**
+
+- We know that this type of treatment alters the intestinal microbiome
+- We hope that treatments that maintain health in the intestine reduce the incidence of aGVHD
+- One potential treatment is an increased consumption of potato starch
+
+**What is our job?**
+
+- Design a one-arm clinical trial in which **all** participants ingest 40g of starch everyday for up to 100 days
+
+## Research Question 1
+
+**What is the sample size needed to detect a reduction of the 50% historical rate of aGVHD to each of the following**
+
+- 40% (small potato starch effect)
+- 35% (medium potato starch effect)
+- 30% (large potato starch effect)
+
+**with 80% power and 5% type I error?**
+
+## Pertinent Information
+
+**Distribution of time-to-onset of aGVHD**
+
+- 1st Quartile: 7 days
+- Median: 28 days
+- 3rd Quartile: 56 days
+
+**Competing Risks**
+
+- 15% will experience some form of competing risk unrelated to the treatment and will not be observable for aGVHD
+
+**Patient Noncompliance**
+
+- 20% will discontinue taking starch unrelated to aGVHD
+
+## Methodology
+
+1. Simulate survival data to replicate each treatment effect
+2. With this data, plot the Kaplan-Meier curve and determine if it is significantly different from 50% survival at Day 100 by looking at the 95% confidence interval
+3. Repeat Steps 1 and 2 many times and the proportion of significant findings is the power
+    
+    - Repeated Steps 1 and 2 ten thousand times
+    - Repeated Steps 1-3 for different sample sizes (10 to 300, by 5)
+
+
+
+## Simulate Survival Data
+
+Sample from a $Binomial(N,p)$ to determine those who get aGVHD during treatment
+
+- $N$ is the sample size
+- $p$ is one of three treatment effect sizes
+
+Sample from a **Truncated Exponential Distribution** to determine the survival time of those who get aGVHD
+
+- Truncated at 100 days to follow the definition of aGVHD
+- Those who do not get aGVHD given an arbitrary survival time greater than 100 (e.g. 110 days)
+
+## The Truncated Exponential Distribution
+
+![Sampling distribution of aGVHD times](truncated_exp.jpeg)
+
+## The Truncated Exponential Distribution
+
+$F(x)=\frac{1-\exp(-x/\lambda)}{1-\exp(-100/\lambda)}$
+
+Solve for $\lambda$ such that $F(28)=0.5$ (Median is 28 days)
+
+$\lambda = 49.06266$
+
+The interquartile range doesn't perfectly match up, but it is close enough
+
+- 1st Quartile: 12.03 days (*Target: 7 days*)
+- 3rd Quartile: 51.83 days (*Target: 56 days*)
+
+**Assumption**: The distribution of survival times stays the same for any effect size
+
+## Methodology
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+N <- 100
+lambda <- 49.06266
+p <- 0.4
+samp <- runif(N,0,1)
+aGVHD <- samp < p
+time <- rep(110,N)
+time[aGVHD] <- -lambda*log(1-runif(sum(aGVHD),0,1)*(1-exp(-100/lambda)))
+data <- data.frame(round(time,2),as.numeric(aGVHD))
+colnames(data) <- c("Time","aGVHD")
+data[1:10,]
+```
+
+## Methodology
+
+![No competing risks and full patient compliance](km100.jpeg)
+
+## Results
+
+![10,000 Simulations](power_curve01.jpeg)
+
+## Methodology
+
+**Adjusting for competing risks**
+
+- Independently sample from a $Binomial(N,p=0.15)$ to determine those who experience a competing risk
+- The time-to-onset of the competing risk is sampled from a $Uniform(0,100)$
+- These people are censored, but provide information for as long as they were treated before the competing risk
+
+**Adjusting for noncompliance**
+
+- Independently sample from a $Binomial(N,p=0.20)$ to determine those who discontinue taking starch
+- The time-to-noncompliance is sampled from a $Uniform(0,100)$
+- These people are censored, but provide information for as long as they were actually taking the treatment
+
+## Methodology
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+N <- 100
+lambda <- 49.06266
+p <- 0.4
+samp <- runif(N,0,1)
+aGVHD <- samp < p
+time <- rep(110,N)
+time[aGVHD] <- -lambda*log(1-runif(sum(aGVHD),0,1)*(1-exp(-100/lambda)))
+q <- 0.15
+samp2 <- runif(N,0,1)
+comp_risk <- samp2 < q
+time2 <- rep(110,N)
+time2[comp_risk] <- runif(sum(comp_risk),0,100)
+c <- 0.20
+samp3 <- runif(N,0,1)
+noncomp <- samp3 < c
+time3 <- rep(110,N)
+time3[noncomp] <- runif(sum(noncomp),0,100)
+time_mat <- matrix(c(time,time2,time3),ncol = 3)
+time4 <- apply(time_mat,1,min)
+aGVHDnew <- aGVHD*(time < time2)*(time < time3)
+data <- data.frame(round(time,2),as.numeric(aGVHD),round(time2,2),as.numeric(comp_risk),round(time3,2),as.numeric(noncomp),round(time4,2),aGVHDnew)
+colnames(data) <- c("Time","aGVHD","Time_CR","CR","Time_NC","NC","Time_E","Event")
+data[1:10,]
+```
+
+## Methodology
+
+![With 15% competing risks and 80% patient compliance](km100b.jpeg)
+
+## Results
+
+![10,000 Simulations](power_curve02.jpeg)
+
+## Research Question 2
+
+**How would you design the study to include one interim analysis of futility, and how does this affect the sample size you found previously?**
+
+- to be determined ...
+
+## Saw-Toothed Behavior
+
+"For continuous random variables it is intuitively clear that for a given significance level and alternative hypothesis the power function increases monotonically as the sample size increases. One would expect the same to be true for discrete random variables, but such is not the case... The reason for this counter-intuitive result is that a significance level of 0.05, for example, cannot be obtained exactly for most sample sizes. So by a 0.05 significance level for a given sample size n we mean the largest level below 0.05. That level determines the critical value for the test statistic and the critical value determines the power at any given alternative. If n is such that the exact significance level is appreciably lower than 0.05 (say 0.01) and the power is 80% at a particular alternative, the power could easily drop below 80% for n + 1 and the same alternative hypothesis, since the exact significance level does not remain at 0.01 but may stay below but get closer to 0.05. This is particularly the case for small n."
